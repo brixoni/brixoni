@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BRIXONI | مؤشر الحرب في الشرق الأوسط</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Cairo:wght@300;400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --red:#c0392b; --red-glow:#e74c3c;
+      --blue:#1a6fa8; --blue-glow:#2980b9;
+      --gold:#f39c12; --gold-light:#f1c40f;
+      --bg:#060a0f; --bg2:#0d1520; --bg3:#111d2b;
+      --text:#c8d8e8; --text-dim:#6a8aaa;
+      --border:#1e3a5f; --green:#27ae60;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;overflow-x:hidden;min-height:100vh}
+    body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.07) 2px,rgba(0,0,0,.07) 4px)}
+    body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(30,58,95,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(30,58,95,.13) 1px,transparent 1px);background-size:40px 40px}
+
+    .lang-toggle{position:fixed;top:12px;left:12px;z-index:9999;display:flex;gap:4px}
+    .lang-btn{background:rgba(13,21,32,.9);border:1px solid var(--border);color:var(--text-dim);font-family:'Rajdhani',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.1em;padding:5px 10px;cursor:pointer;border-radius:2px;transition:all .2s}
+    .lang-btn.active{background:rgba(243,156,18,.15);border-color:var(--gold);color:var(--gold-light)}
+
+    header{position:relative;z-index:10;text-align:center;padding:26px 20px 18px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(6,10,15,.98) 0%,rgba(13,21,32,.9) 100%)}
+    .logo-line{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:5px}
+    .logo-text{font-family:'Rajdhani',sans-serif;font-size:clamp(2rem,6vw,3.8rem);font-weight:700;letter-spacing:.12em;color:#fff;text-shadow:0 0 30px rgba(192,57,43,.6),0 0 60px rgba(192,57,43,.3)}
+    .logo-badge{background:var(--red);color:#fff;font-family:'Rajdhani',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.15em;padding:3px 8px;border-radius:2px;animation:pulseBadge 2s ease-in-out infinite}
+    @keyframes pulseBadge{0%,100%{opacity:1}50%{opacity:.5}}
+    .subtitle{font-family:'Rajdhani',sans-serif;font-size:clamp(.75rem,2vw,1rem);letter-spacing:.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:4px}
+    .live-dot{display:inline-flex;align-items:center;gap:6px;font-size:.7rem;letter-spacing:.2em;color:var(--red-glow);font-family:'Share Tech Mono',monospace}
+    .live-dot::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--red-glow);box-shadow:0 0 8px var(--red-glow);animation:blink 1.2s ease-in-out infinite}
+    @keyframes blink{0%,100%{opacity:1;box-shadow:0 0 8px var(--red-glow)}50%{opacity:.3;box-shadow:none}}
+
+    .war-counter{position:relative;z-index:10;background:rgba(192,57,43,.07);border-bottom:1px solid rgba(192,57,43,.2);padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap}
+    .counter-item{text-align:center}
+    .counter-num{font-family:'Rajdhani',sans-serif;font-size:clamp(1.2rem,3vw,1.8rem);font-weight:700;color:var(--gold-light);text-shadow:0 0 15px rgba(241,196,15,.4)}
+    .counter-lbl{font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--text-dim);letter-spacing:.15em;text-transform:uppercase}
+    .counter-sep{color:var(--border);font-size:1.5rem}
+
+    .markets-bar{position:relative;z-index:10;background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+    .market-item{display:flex;align-items:center;gap:8px;flex-shrink:0}
+    .market-label{font-family:'Rajdhani',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.1em;color:var(--text-dim);text-transform:uppercase}
+    .market-value{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--text)}
+    .market-change{font-family:'Share Tech Mono',monospace;font-size:.7rem}
+    .market-change.up{color:var(--green)}
+    .market-change.down{color:var(--red-glow)}
+    .market-sep{color:var(--border)}
+    .vix-badge{padding:2px 7px;border-radius:2px;font-family:'Rajdhani',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.08em}
+    .vix-low{background:rgba(39,174,96,.2);color:#2ecc71;border:1px solid rgba(39,174,96,.4)}
+    .vix-mid{background:rgba(243,156,18,.2);color:#f39c12;border:1px solid rgba(243,156,18,.4)}
+    .vix-high{background:rgba(192,57,43,.25);color:#e74c3c;border:1px solid rgba(192,57,43,.4)}
+
+    .straits-bar{position:relative;z-index:10;background:rgba(26,111,168,.05);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:center}
+    .strait-item{display:flex;align-items:center;gap:8px;padding:4px 12px;border-radius:2px;border:1px solid var(--border);background:rgba(13,21,32,.6)}
+    .strait-name{font-family:'Rajdhani',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;color:var(--text)}
+    .strait-status{font-family:'Share Tech Mono',monospace;font-size:.65rem;padding:2px 6px;border-radius:2px}
+    .status-open{background:rgba(39,174,96,.2);color:#2ecc71;border:1px solid rgba(39,174,96,.4)}
+    .status-threat{background:rgba(243,156,18,.2);color:#f39c12;border:1px solid rgba(243,156,18,.4)}
+    .status-closed{background:rgba(192,57,43,.25);color:#e74c3c;border:1px solid rgba(192,57,43,.4)}
+
+    .ai-bar{position:relative;z-index:10;background:rgba(243,156,18,.07);border-bottom:1px solid rgba(243,156,18,.2);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .ai-status{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim);letter-spacing:.08em}
+    .ai-status span{color:var(--gold)}
+    .ai-btn{background:linear-gradient(135deg,rgba(243,156,18,.15),rgba(243,156,18,.05));border:1px solid rgba(243,156,18,.5);color:var(--gold-light);font-family:'Rajdhani',sans-serif;font-size:.85rem;font-weight:700;letter-spacing:.1em;padding:8px 20px;cursor:pointer;border-radius:3px;transition:all .2s;display:flex;align-items:center;gap:8px}
+    .ai-btn:hover{background:rgba(243,156,18,.25);border-color:var(--gold-light)}
+    .ai-btn:disabled{opacity:.4;cursor:not-allowed}
+    .auto-badge{font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--green);letter-spacing:.08em;border:1px solid rgba(39,174,96,.3);padding:2px 6px;border-radius:2px}
+    .spin{display:inline-block;animation:spin 1s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .ai-log{position:relative;z-index:10;background:rgba(6,10,15,.95);border-bottom:1px solid var(--border);padding:10px 20px;font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--green);letter-spacing:.07em;display:none;max-height:80px;overflow-y:auto}
+    .ai-log p{margin-bottom:3px}
+
+    .balance-section{position:relative;z-index:10;background:var(--bg2);border-bottom:1px solid var(--border);padding:18px 20px}
+    .balance-title{text-align:center;font-size:.7rem;letter-spacing:.3em;color:var(--text-dim);font-family:'Rajdhani',sans-serif;text-transform:uppercase;margin-bottom:12px}
+    .balance-labels{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .b-lbl-l{font-family:'Rajdhani',sans-serif;font-size:clamp(.75rem,2vw,1rem);font-weight:700;color:#e74c3c}
+    .b-lbl-r{font-family:'Rajdhani',sans-serif;font-size:clamp(.75rem,2vw,1rem);font-weight:700;color:#2980b9}
+    .b-pct-l{font-size:clamp(1.4rem,4vw,2.2rem);font-weight:900;color:#e74c3c;text-shadow:0 0 20px rgba(231,76,60,.5)}
+    .b-pct-r{font-size:clamp(1.4rem,4vw,2.2rem);font-weight:900;color:#2980b9;text-shadow:0 0 20px rgba(41,128,185,.5)}
+    .balance-bar-wrap{height:14px;border-radius:2px;background:var(--bg3);overflow:hidden;border:1px solid var(--border);position:relative}
+    .balance-bar-fill{height:100%;background:linear-gradient(90deg,#c0392b 0%,#e74c3c 40%,#2980b9 60%,#1a6fa8 100%)}
+    .balance-bar-marker{position:absolute;top:-3px;bottom:-3px;width:3px;background:#fff;border-radius:2px;box-shadow:0 0 8px #fff;transition:left 1s ease}
+    .balance-note{text-align:center;font-size:.62rem;color:var(--text-dim);font-family:'Share Tech Mono',monospace;margin-top:6px;letter-spacing:.1em}
+
+    .fronts-section{position:relative;z-index:10;background:var(--bg3);border-bottom:1px solid var(--border);padding:14px 20px}
+    .fronts-title{font-family:'Rajdhani',sans-serif;font-size:.65rem;letter-spacing:.28em;color:var(--text-dim);text-transform:uppercase;margin-bottom:10px;text-align:center}
+    .fronts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+    .front-card{background:var(--bg2);border:1px solid var(--border);padding:10px 12px;border-radius:3px;text-align:center}
+    .front-name{font-family:'Rajdhani',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.1em;margin-bottom:4px}
+    .front-status-badge{font-family:'Share Tech Mono',monospace;font-size:.62rem;padding:2px 6px;border-radius:2px;display:inline-block}
+    .front-intensity{font-size:.6rem;color:var(--text-dim);margin-top:4px;font-family:'Share Tech Mono',monospace}
+
+    .main-grid{position:relative;z-index:10;display:grid;grid-template-columns:1fr 1fr;max-width:1400px;margin:0 auto}
+    @media(max-width:768px){.main-grid{grid-template-columns:1fr}}
+
+    .tension-section{grid-column:1/-1;background:var(--bg2);border-bottom:1px solid var(--border);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    .tension-label{font-family:'Rajdhani',sans-serif;font-size:.7rem;letter-spacing:.25em;color:var(--text-dim);text-transform:uppercase}
+    .tension-value{font-family:'Rajdhani',sans-serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:700;color:var(--gold-light);text-shadow:0 0 20px rgba(241,196,15,.6);letter-spacing:.1em}
+    .tension-bar-wrap{flex:1;min-width:180px;height:10px;background:var(--bg3);border-radius:2px;overflow:hidden;border:1px solid var(--border)}
+    .tension-bar-fill{height:100%;background:linear-gradient(90deg,#27ae60,#f39c12,#e74c3c);transition:width 1s ease}
+    .tension-status{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:#e74c3c;letter-spacing:.15em;animation:pulseBadge 1.8s ease-in-out infinite}
+
+    .faction-panel{padding:20px 16px;border-bottom:1px solid var(--border)}
+    .faction-panel.iran-side{border-right:1px solid var(--border);background:linear-gradient(135deg,rgba(192,57,43,.06) 0%,transparent 50%)}
+    .faction-panel.usa-side{background:linear-gradient(135deg,rgba(26,111,168,.06) 0%,transparent 50%)}
+    .faction-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+    .faction-icon{width:36px;height:36px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+    .iran-side .faction-icon{background:rgba(192,57,43,.2);border:1px solid rgba(192,57,43,.4)}
+    .usa-side .faction-icon{background:rgba(26,111,168,.2);border:1px solid rgba(26,111,168,.4)}
+    .faction-name{font-family:'Rajdhani',sans-serif;font-size:clamp(.9rem,2.5vw,1.2rem);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+    .iran-side .faction-name{color:#e74c3c}
+    .usa-side .faction-name{color:#2980b9}
+    .faction-subtitle{font-size:.68rem;color:var(--text-dim);letter-spacing:.1em}
+
+    .allies-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+    .ally-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:2px;font-size:.68rem;font-weight:600;letter-spacing:.05em;border:1px solid}
+    .iran-side .ally-tag{background:rgba(192,57,43,.12);border-color:rgba(192,57,43,.35);color:#e8a89a}
+    .usa-side .ally-tag{background:rgba(26,111,168,.12);border-color:rgba(26,111,168,.35);color:#8ab8d8}
+
+    .cap-title{font-family:'Rajdhani',sans-serif;font-size:.65rem;letter-spacing:.25em;color:var(--text-dim);text-transform:uppercase;margin-bottom:8px}
+    .cap-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+    .cap-icon{font-size:.85rem;width:20px;text-align:center;flex-shrink:0}
+    .cap-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);width:55px;flex-shrink:0}
+    .cap-bar-bg{flex:1;height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+    .cap-bar-fill{height:100%;border-radius:3px;transition:width 1.2s ease}
+    .iran-side .cap-bar-fill{background:linear-gradient(90deg,#c0392b,#e74c3c)}
+    .usa-side .cap-bar-fill{background:linear-gradient(90deg,#1a6fa8,#2980b9)}
+    .cap-value{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--text-dim);width:30px;text-align:right;flex-shrink:0}
+
+    .feed-section{padding:16px;border-bottom:1px solid var(--border)}
+    .feed-section.iran-side{border-right:1px solid var(--border)}
+    .feed-title{font-family:'Rajdhani',sans-serif;font-size:.65rem;letter-spacing:.28em;color:var(--text-dim);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+    .feed-title::after{content:'';flex:1;height:1px;background:var(--border)}
+    .feed-item{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);font-size:.72rem;line-height:1.5;animation:fadein .5s ease}
+    @keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+    .feed-time{font-family:'Share Tech Mono',monospace;color:var(--text-dim);font-size:.62rem;flex-shrink:0;padding-top:2px}
+    .feed-type{font-size:.6rem;padding:1px 5px;border-radius:2px;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:.05em;flex-shrink:0;height:fit-content;margin-top:2px}
+    .type-strike{background:rgba(192,57,43,.25);color:#e74c3c;border:1px solid rgba(192,57,43,.4)}
+    .type-drone{background:rgba(243,156,18,.2);color:#f39c12;border:1px solid rgba(243,156,18,.4)}
+    .type-diplo{background:rgba(39,174,96,.2);color:#2ecc71;border:1px solid rgba(39,174,96,.4)}
+    .type-naval{background:rgba(26,111,168,.2);color:#2980b9;border:1px solid rgba(26,111,168,.4)}
+    .type-intel{background:rgba(155,89,182,.2);color:#9b59b6;border:1px solid rgba(155,89,182,.4)}
+    .type-nuke{background:rgba(192,57,43,.35);color:#ff6b6b;border:1px solid rgba(192,57,43,.6)}
+
+    .ticker-wrap{position:relative;z-index:10;background:rgba(192,57,43,.08);border-bottom:1px solid rgba(192,57,43,.2);padding:8px 0;overflow:hidden;display:flex;align-items:center}
+    .ticker-label{flex-shrink:0;padding:0 14px;font-family:'Rajdhani',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.15em;color:var(--red-glow);background:rgba(192,57,43,.2);border-radius:2px;margin:0 12px;white-space:nowrap}
+    .ticker-track{display:flex;animation:ticker 45s linear infinite;white-space:nowrap}
+    .ticker-track:hover{animation-play-state:paused}
+    @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+    .ticker-item{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--text);padding:0 30px;letter-spacing:.05em}
+    .ticker-dot{color:var(--gold);margin-left:8px}
+
+    .update-bar{position:relative;z-index:10;background:var(--bg);border-bottom:1px solid var(--border);padding:8px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+    .update-text{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);letter-spacing:.08em}
+    .share-btn{background:rgba(26,111,168,.1);border:1px solid rgba(26,111,168,.3);color:#2980b9;font-family:'Rajdhani',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.08em;padding:4px 12px;cursor:pointer;border-radius:2px;transition:all .2s}
+    .share-btn:hover{background:rgba(26,111,168,.25)}
+
+    footer{position:relative;z-index:10;text-align:center;padding:16px;border-top:1px solid var(--border);font-size:.62rem;color:var(--text-dim);font-family:'Share Tech Mono',monospace;letter-spacing:.08em}
+
+    @media(max-width:768px){
+      .tension-section{flex-direction:column;text-align:center}
+      .feed-section.iran-side{border-right:none}
+      .markets-bar{gap:10px}
+      .lang-toggle{top:8px;left:8px}
+    }
+
+    html[data-lang="en"]{direction:ltr}
+    html[data-lang="en"] body{font-family:'Rajdhani',sans-serif}
+    html[data-lang="en"] .faction-panel.iran-side{border-right:none;border-left:1px solid var(--border)}
+    html[data-lang="en"] .feed-section.iran-side{border-right:none;border-left:1px solid var(--border)}
+    html[data-lang="en"] .lang-toggle{left:auto;right:12px}
+  </style>
+</head>
+<body>
+
+<div class="lang-toggle">
+  <button class="lang-btn active" onclick="setLang('ar')" id="btn-ar">AR</button>
+  <button class="lang-btn" onclick="setLang('en')" id="btn-en">EN</button>
+</div>
+
+<header>
+  <div class="logo-line">
+    <span class="logo-text">BRIXONI</span>
+    <span class="logo-badge">LIVE</span>
+  </div>
+  <div class="subtitle" id="lbl-subtitle">مؤشر الحرب — الشرق الأوسط</div>
+  <div class="live-dot" id="lbl-livesub">تحليل جيوسياسي مباشر</div>
+</header>
+
+<!-- WAR COUNTER -->
+<div class="war-counter">
+  <div class="counter-item">
+    <div class="counter-num" id="counter-days">---</div>
+    <div class="counter-lbl" id="lbl-days">يوم</div>
+  </div>
+  <div class="counter-sep">|</div>
+  <div class="counter-item">
+    <div class="counter-num" id="counter-hours">--</div>
+    <div class="counter-lbl" id="lbl-hours">ساعة</div>
+  </div>
+  <div class="counter-sep">|</div>
+  <div class="counter-item">
+    <div class="counter-num" id="counter-mins">--</div>
+    <div class="counter-lbl" id="lbl-mins">دقيقة</div>
+  </div>
+  <div class="counter-sep">|</div>
+  <div style="text-align:center">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--text-dim);letter-spacing:.1em" id="lbl-since">منذ بداية الصراع المتصاعد</div>
+    <div style="font-family:'Rajdhani',sans-serif;font-size:.75rem;color:var(--red-glow);letter-spacing:.12em">7 OCT 2023</div>
+  </div>
+</div>
+
+<!-- MARKETS BAR -->
+<div class="markets-bar">
+  <div class="market-item">
+    <span class="market-label">S&P 500</span>
+    <span class="market-value" id="sp500-val">---</span>
+    <span class="market-change" id="sp500-chg">--</span>
+  </div>
+  <span class="market-sep">|</span>
+  <div class="market-item">
+    <span class="market-label">DOW</span>
+    <span class="market-value" id="dow-val">---</span>
+    <span class="market-change" id="dow-chg">--</span>
+  </div>
+  <span class="market-sep">|</span>
+  <div class="market-item">
+    <span class="market-label" id="lbl-vix">مؤشر الهلع</span>
+    <span class="market-value" id="vix-val">--</span>
+    <span class="vix-badge vix-mid" id="vix-badge">--</span>
+  </div>
+  <span class="market-sep">|</span>
+  <div class="market-item">
+    <span class="market-label" id="lbl-oil">نفط خام</span>
+    <span class="market-value" id="oil-val">--$</span>
+    <span class="market-change" id="oil-chg">--</span>
+  </div>
+  <span style="font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--text-dim);margin-right:auto;margin-left:auto" id="lbl-market-note">تأثير السوق: <span id="market-impact" style="color:var(--gold)">محايد</span></span>
+</div>
+
+<!-- STRAITS BAR -->
+<div class="straits-bar">
+  <div style="font-family:'Rajdhani',sans-serif;font-size:.65rem;letter-spacing:.2em;color:var(--text-dim);text-transform:uppercase" id="lbl-straits">المضايق الاستراتيجية</div>
+  <div class="strait-item">
+    <span class="strait-name" id="lbl-hormuz">مضيق هرمز</span>
+    <span class="strait-status status-open" id="hormuz-status">مفتوح</span>
+  </div>
+  <div class="strait-item">
+    <span class="strait-name" id="lbl-mandab">باب المندب</span>
+    <span class="strait-status status-threat" id="mandab-status">مهدد</span>
+  </div>
+</div>
+
+<!-- AI BAR -->
+<div class="ai-bar">
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <div class="ai-status">Gemini AI: <span id="ai-state">جاهز للتحديث</span></div>
+    <span class="auto-badge" id="lbl-auto">⟳ تحديث كل 30 دقيقة</span>
+  </div>
+  <button class="ai-btn" id="ai-btn" onclick="runAIUpdate()">
+    <span id="ai-btn-icon">⚡</span> <span id="lbl-update-btn">تحديث بالذكاء الاصطناعي</span>
+  </button>
+</div>
+<div class="ai-log" id="ai-log"></div>
+
+<!-- BALANCE -->
+<div class="balance-section">
+  <div class="balance-title" id="lbl-balance-title">▸ الميزان الجيوسياسي الراهن ◂</div>
+  <div class="balance-labels">
+    <div>
+      <div class="b-lbl-l" id="lbl-iran-side">🇮🇷 إيران وحلفاؤها</div>
+      <div class="b-pct-l" id="iran-pct">42%</div>
+    </div>
+    <div style="text-align:center;font-size:.65rem;color:var(--text-dim);font-family:'Share Tech Mono',monospace;letter-spacing:.1em" id="lbl-current-tilt">ميل حالي</div>
+    <div style="text-align:left">
+      <div class="b-lbl-r" id="lbl-usa-side">الولايات المتحدة وإسرائيل 🇺🇸🇮🇱</div>
+      <div class="b-pct-r" id="usa-pct">58%</div>
+    </div>
+  </div>
+  <div class="balance-bar-wrap">
+    <div class="balance-bar-fill" style="width:100%"></div>
+    <div class="balance-bar-marker" id="balance-marker" style="left:42%"></div>
+  </div>
+  <div class="balance-note" id="lbl-balance-note">— هذه تقديرات تحليلية وليست معطيات رسمية —</div>
+</div>
+
+<!-- FRONTS -->
+<div class="fronts-section">
+  <div class="fronts-title" id="lbl-fronts">▸ الجبهات النشطة ◂</div>
+  <div class="fronts-grid">
+    <div class="front-card">
+      <div class="front-name" style="color:#e74c3c">🇵🇸 <span id="lbl-front-gaza">غزة</span></div>
+      <div class="front-status-badge type-strike" id="gaza-status">حرب مستمرة</div>
+      <div class="front-intensity" id="gaza-intensity">شدة: مرتفعة جداً</div>
+    </div>
+    <div class="front-card">
+      <div class="front-name" style="color:#e74c3c">🇱🇧 <span id="lbl-front-lebanon">لبنان</span></div>
+      <div class="front-status-badge type-drone" id="lebanon-status">توتر متقطع</div>
+      <div class="front-intensity" id="lebanon-intensity">شدة: متوسطة</div>
+    </div>
+    <div class="front-card">
+      <div class="front-name" style="color:#f39c12">🇾🇪 <span id="lbl-front-yemen">اليمن</span></div>
+      <div class="front-status-badge type-naval" id="yemen-status">هجمات بحرية</div>
+      <div class="front-intensity" id="yemen-intensity">شدة: مرتفعة</div>
+    </div>
+    <div class="front-card">
+      <div class="front-name" style="color:#e74c3c">🇮🇷 <span id="lbl-front-iran">إيران مباشرة</span></div>
+      <div class="front-status-badge type-intel" id="iran-front-status">استنفار</div>
+      <div class="front-intensity" id="iran-intensity">شدة: متوسطة</div>
+    </div>
+    <div class="front-card">
+      <div class="front-name" style="color:#2980b9">🇮🇶 <span id="lbl-front-iraq">العراق</span></div>
+      <div class="front-status-badge type-strike" id="iraq-status">فصائل نشطة</div>
+      <div class="front-intensity" id="iraq-intensity">شدة: منخفضة</div>
+    </div>
+  </div>
+</div>
+
+<div class="main-grid">
+  <div class="tension-section">
+    <div>
+      <div class="tension-label" id="lbl-tension">مقياس التوتر الإقليمي</div>
+      <div class="tension-value" id="tension-label">مرتفع جداً</div>
+    </div>
+    <div class="tension-bar-wrap">
+      <div class="tension-bar-fill" id="tension-bar" style="width:82%"></div>
+    </div>
+    <div class="tension-status" id="tension-status">⚠ تصعيد نشط</div>
+  </div>
+
+  <!-- IRAN PANEL -->
+  <div class="faction-panel iran-side">
+    <div class="faction-header">
+      <div class="faction-icon">🔴</div>
+      <div>
+        <div class="faction-name" id="lbl-iran-name">إيران ومحور المقاومة</div>
+        <div class="faction-subtitle">IRAN & AXIS OF RESISTANCE</div>
+      </div>
+    </div>
+    <div class="cap-title" id="lbl-allies">الحلفاء الرئيسيون</div>
+    <div class="allies-list">
+      <span class="ally-tag">🇮🇷 إيران</span>
+      <span class="ally-tag">🇱🇧 حزب الله</span>
+      <span class="ally-tag">🇾🇪 الحوثيون</span>
+      <span class="ally-tag">🇮🇶 الفصائل العراقية</span>
+    </div>
+    <div class="cap-title" id="lbl-milcap">▸ القدرات العسكرية</div>
+    <div class="cap-row"><span class="cap-icon">✈️</span><span class="cap-label" id="lbl-air">جوي</span><div class="cap-bar-bg"><div class="cap-bar-fill" id="iran-air" style="width:52%"></div></div><span class="cap-value" id="iran-air-v">52%</span></div>
+    <div class="cap-row"><span class="cap-icon">🚀</span><span class="cap-label" id="lbl-mis">صواريخ</span><div class="cap-bar-bg"><div class="cap-bar-fill" id="iran-mis" style="width:78%"></div></div><span class="cap-value" id="iran-mis-v">78%</span></div>
+    <div class="cap-row"><span class="cap-icon">🛸</span><span class="cap-label" id="lbl-drone">طائرات</span><div class="cap-bar-bg"><div class="cap-bar-fill" id="iran-drone" style="width:70%"></div></div><span class="cap-value" id="iran-drone-v">70%</span></div>
+    <div class="cap-row"><span class="cap-icon">⚓</span><span class="cap-label" id="lbl-naval">بحري</span><div class="cap-bar-bg"><div class="cap-bar-fill" id="iran-nav" style="width:45%"></div></div><span class="cap-value" id="iran-nav-v">45%</span></div>
+    <div class="cap-row"><span class="cap-icon">☢️</span><span class="cap-label" id="lbl-nuke">نووي</span><div class="cap-bar-bg"><div class="cap-bar-fill" id="iran-nuke" style="width:60%"></div></div><span class="cap-value" id="iran-nuke-v">60%</span></div>
+    <div class="cap-row"><span class="cap-icon">💰</span><span class="cap-label" id="lbl-econ">اقتصاد</span><div class="cap-bar-bg"><div class="cap-bar-fill" id="iran-econ" style="width:30%"></div></div><span class="cap-value" id="iran-econ-v">30%</span></div>
+  </div>
+
+  <!-- USA PANEL -->
+  <div class="faction-panel usa-side">
+    <div class="faction-header">
+      <div class="faction-icon">🔵</div>
+      <div>
+        <div class="faction-name" id="lbl-usa-name">الولايات المتحدة وإسرائيل</div>
+        <div class="faction-subtitle">USA, ISRAEL & ALLIES</div>
+      </div>
+    </div>
+    <div class="cap-title" id="lbl-allies2">الحلفاء الرئيسيون</div>
+    <div class="allies-list">
+      <span class="ally-tag">🇺🇸 الولايات المتحدة</span>
+      <span class="ally-tag">🇮🇱 إسرائيل</span>
+      <span class="ally-tag">🇬🇧 بريطانيا</span>
+      <span class="ally-tag">🇸🇦 السعودية</span>
+      <span class="ally-tag">🇦🇪 الإمارات</span>
+      <span class="ally-tag">🇧🇭 البحرين</span>
+      <span class="ally-tag">🇰🇼 الكويت</span>
+      <span class="ally-tag">🇶🇦 قطر</span>
+    </div>
+    <div class="cap-title" id="lbl-milcap2">▸ القدرات العسكرية</div>
+    <div class="cap-row"><span class="cap-icon">✈️</span><span class="cap-label" id="lbl-air2">جوي</span><div class="cap-bar-bg"><div class="cap-bar-fill" id="usa-air" style="width:94%"></div></div><span class="cap-value" id="usa-air-v">94%</span></div>
+    <div class="cap-row"><span class="cap-icon">🚀</span><span class="cap-label" id="lbl-mis2">صواريخ</span><div class="cap-bar-bg"><div class="cap-bar-fill" id="usa-mis" style="width:88%"></div></div><span class="cap-value" id="usa-mis-v">88%</span></div>
+    <div class="cap-row"><span class="cap-icon">🛸</span><span class="cap-label" id="lbl-drone2">طائرات</span><div class="cap-bar-bg"><div class="cap-bar-fill" id="usa-drone" style="width:85%"></div></div><span class="cap-value" id="usa-drone-v">85%</span></div>
+    <div class="cap-row"><span class="cap-icon">⚓</span><span class="cap-label" id="lbl-naval2">بحري</span><div class="cap-bar-bg"><div class="cap-bar-fill" id="usa-nav" style="width:96%"></div></div><span class="cap-value" id="usa-nav-v">96%</span></div>
+    <div class="cap-row"><span class="cap-icon">☢️</span><span class="cap-label" id="lbl-nuke2">نووي</span><div class="cap-bar-bg"><div class="cap-bar-fill" id="usa-nuke" style="width:99%"></div></div><span class="cap-value" id="usa-nuke-v">99%</span></div>
+    <div class="cap-row"><span class="cap-icon">💰</span><span class="cap-label" id="lbl-econ2">اقتصاد</span><div class="cap-bar-bg"><div class="cap-bar-fill" id="usa-econ" style="width:92%"></div></div><span class="cap-value" id="usa-econ-v">92%</span></div>
+  </div>
+
+  <!-- IRAN FEED -->
+  <div class="feed-section iran-side">
+    <div class="feed-title" id="lbl-iran-feed">نشاط — محور المقاومة</div>
+    <div id="iran-feed">
+      <div class="feed-item"><span class="feed-time">--:--</span><span class="feed-type type-intel">انتظار</span><span>اضغط تحديث لجلب آخر الأحداث تلقائياً</span></div>
+    </div>
+  </div>
+
+  <!-- USA FEED -->
+  <div class="feed-section usa-side">
+    <div class="feed-title" id="lbl-usa-feed">نشاط — التحالف الغربي</div>
+    <div id="usa-feed">
+      <div class="feed-item"><span class="feed-time">--:--</span><span class="feed-type type-naval">انتظار</span><span>اضغط تحديث لجلب آخر الأحداث تلقائياً</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <span class="ticker-label" id="lbl-ticker">آخر الأخبار</span>
+  <div style="overflow:hidden;flex:1">
+    <div class="ticker-track" id="ticker-track">
+      <span class="ticker-item">جاري تحميل آخر الأخبار... اضغط تحديث <span class="ticker-dot">⚡</span></span>
+      <span class="ticker-item">BRIXONI — مؤشر الحرب في الشرق الأوسط <span class="ticker-dot">🔴</span></span>
+      <span class="ticker-item">تحليل جيوسياسي مدعوم بالذكاء الاصطناعي Gemini <span class="ticker-dot">🤖</span></span>
+      <span class="ticker-item">جاري تحميل آخر الأخبار... اضغط تحديث <span class="ticker-dot">⚡</span></span>
+      <span class="ticker-item">BRIXONI — مؤشر الحرب في الشرق الأوسط <span class="ticker-dot">🔴</span></span>
+      <span class="ticker-item">تحليل جيوسياسي مدعوم بالذكاء الاصطناعي Gemini <span class="ticker-dot">🤖</span></span>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div style="position:relative;z-index:10;background:var(--bg2);border-top:1px solid var(--border);padding:24px 20px">
+  <div style="font-family:'Rajdhani',sans-serif;font-size:.7rem;letter-spacing:.3em;color:var(--text-dim);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px" id="lbl-about">
+    ▸ من نحن ◂ <span style="flex:1;height:1px;background:var(--border);display:inline-block"></span>
+  </div>
+  <p style="font-size:.78rem;line-height:1.8;color:var(--text);margin-bottom:14px;max-width:700px" id="about-text-ar">
+    <strong>BRIXONI</strong> منصة تحليل جيوسياسي مستقلة، ترصد موازين القوى في الصراعات الإقليمية وتقدمها بشكل مرئي ومفهوم، مدعومة بالذكاء الاصطناعي لتحليل آخر المستجدات لحظة بلحظة. المعلومات المعروضة هي تقديرات تحليلية للأغراض المعلوماتية فقط.
+  </p>
+  <p style="font-size:.78rem;line-height:1.8;color:var(--text);margin-bottom:14px;max-width:700px;display:none" id="about-text-en">
+    <strong>BRIXONI</strong> is an independent geopolitical analysis platform that tracks the balance of power in regional conflicts, presenting data visually powered by AI to analyze the latest developments in real time. All information displayed represents analytical estimates for informational purposes only.
+  </p>
+  <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--text-dim);letter-spacing:.08em">👤 <span id="lbl-founder">المؤسس:</span> <strong style="color:var(--text)">Rezkoune</strong></div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--text-dim);letter-spacing:.08em">📧 <span id="lbl-contact">التواصل:</span> <a href="mailto:brixoniofic@gmail.com" style="color:var(--gold);text-decoration:none">brixoniofic@gmail.com</a></div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--text-dim);letter-spacing:.08em">🌐 <a href="https://brixoni.com" target="_blank" style="color:var(--gold);text-decoration:none">brixoni.com</a></div>
+  </div>
+</div>
+
+<div class="update-bar">
+  <span class="update-text" id="last-updated">آخر تحديث: لم يتم بعد</span>
+  <button class="share-btn" onclick="shareSite()" id="lbl-share">🔗 مشاركة الموقع</button>
+</div>
+
+<footer>BRIXONI.COM — تحليل جيوسياسي مستقل — المعلومات للأغراض التحليلية فقط — Rezkoune © 2025</footer>
+
+<script>
+// ===== TRANSLATIONS =====
+const T = {
+  ar: {
+    subtitle:'مؤشر الحرب — الشرق الأوسط', livesub:'تحليل جيوسياسي مباشر',
+    days:'يوم', hours:'ساعة', mins:'دقيقة', since:'منذ بداية الصراع المتصاعد',
+    vix:'مؤشر الهلع', oil:'نفط خام', straits:'المضايق الاستراتيجية',
+    hormuz:'مضيق هرمز', mandab:'باب المندب',
+    auto:'⟳ تحديث كل 30 دقيقة', 'update-btn':'تحديث بالذكاء الاصطناعي',
+    'balance-title':'▸ الميزان الجيوسياسي الراهن ◂',
+    'iran-side':'🇮🇷 إيران وحلفاؤها', 'usa-side':'الولايات المتحدة وإسرائيل 🇺🇸🇮🇱',
+    'current-tilt':'ميل حالي',
+    'balance-note':'— هذه تقديرات تحليلية وليست معطيات رسمية —',
+    fronts:'▸ الجبهات النشطة ◂',
+    'front-gaza':'غزة','front-lebanon':'لبنان','front-yemen':'اليمن','front-iran':'إيران مباشرة','front-iraq':'العراق',
+    tension:'مقياس التوتر الإقليمي','iran-name':'إيران ومحور المقاومة','usa-name':'الولايات المتحدة وإسرائيل',
+    allies:'الحلفاء الرئيسيون', allies2:'الحلفاء الرئيسيون',
+    milcap:'▸ القدرات العسكرية', milcap2:'▸ القدرات العسكرية',
+    air:'جوي',mis:'صواريخ',drone:'طائرات',naval:'بحري',nuke:'نووي',econ:'اقتصاد',
+    air2:'جوي',mis2:'صواريخ',drone2:'طائرات',naval2:'بحري',nuke2:'نووي',econ2:'اقتصاد',
+    'iran-feed':'نشاط — محور المقاومة', 'usa-feed':'نشاط — التحالف الغربي',
+    ticker:'آخر الأخبار', about:'▸ من نحن ◂', founder:'المؤسس:', contact:'التواصل:',
+    share:'🔗 مشاركة الموقع',
+    vix_low:'هادئ', vix_mid:'قلق', vix_high:'هلع',
+    m_neutral:'محايد', m_iran:'يفيد إيران', m_usa:'يفيد أمريكا',
+    updated:'آخر تحديث بالذكاء الاصطناعي:', not_updated:'آخر تحديث: لم يتم بعد',
+    connecting:'يتصل بـ Gemini...', receiving:'استلمت الرد... أحلل البيانات...',
+    done:'تم التحديث ✓', failed:'فشل التحديث — حاول مجدداً', error:'خطأ',
+    'market-note':'تأثير السوق:'
+  },
+  en: {
+    subtitle:'WAR INDEX — MIDDLE EAST', livesub:'Live Geopolitical Analysis',
+    days:'Days', hours:'Hours', mins:'Minutes', since:'Since the escalating conflict began',
+    vix:'Fear Index (VIX)', oil:'Crude Oil', straits:'Strategic Straits',
+    hormuz:'Strait of Hormuz', mandab:'Bab el-Mandeb',
+    auto:'⟳ Auto-update every 30 min', 'update-btn':'AI Update',
+    'balance-title':'▸ Current Geopolitical Balance ◂',
+    'iran-side':'🇮🇷 Iran & Allies', 'usa-side':'USA & Israel 🇺🇸🇮🇱',
+    'current-tilt':'Current Tilt',
+    'balance-note':'— Analytical estimates, not official data —',
+    fronts:'▸ Active Fronts ◂',
+    'front-gaza':'Gaza','front-lebanon':'Lebanon','front-yemen':'Yemen','front-iran':'Iran Direct','front-iraq':'Iraq',
+    tension:'Regional Tension Index','iran-name':'Iran & Axis of Resistance','usa-name':'USA & Israel',
+    allies:'Key Allies', allies2:'Key Allies',
+    milcap:'▸ Military Capabilities', milcap2:'▸ Military Capabilities',
+    air:'Air',mis:'Missiles',drone:'Drones',naval:'Naval',nuke:'Nuclear',econ:'Economy',
+    air2:'Air',mis2:'Missiles',drone2:'Drones',naval2:'Naval',nuke2:'Nuclear',econ2:'Economy',
+    'iran-feed':'Activity — Axis of Resistance', 'usa-feed':'Activity — Western Alliance',
+    ticker:'LATEST NEWS', about:'▸ About Us ◂', founder:'Founder:', contact:'Contact:',
+    share:'🔗 Share Site',
+    vix_low:'CALM', vix_mid:'WORRIED', vix_high:'PANIC',
+    m_neutral:'Neutral', m_iran:'Favors Iran', m_usa:'Favors USA',
+    updated:'Last AI Update:', not_updated:'Last Update: Not yet',
+    connecting:'Connecting to Gemini...', receiving:'Response received, analyzing...',
+    done:'Updated ✓', failed:'Update failed — try again', error:'Error',
+    'market-note':'Market Impact:'
+  }
+};
+
+let currentLang = 'ar';
+
+function setLang(lang) {
+  currentLang = lang;
+  document.documentElement.setAttribute('data-lang', lang);
+  document.documentElement.setAttribute('lang', lang);
+  document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+  document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  const t = T[lang];
+  const ids = ['subtitle','livesub','days','hours','mins','since','vix','oil','market-note',
+    'straits','hormuz','mandab','auto','update-btn','balance-title','iran-side','usa-side',
+    'current-tilt','balance-note','fronts','front-gaza','front-lebanon','front-yemen',
+    'front-iran','front-iraq','tension','iran-name','usa-name','allies','allies2',
+    'milcap','milcap2','air','mis','drone','naval','nuke','econ',
+    'air2','mis2','drone2','naval2','nuke2','econ2',
+    'iran-feed','usa-feed','ticker','about','founder','contact','share'];
+  ids.forEach(id => {
+    const el = document.getElementById('lbl-' + id);
+    if (el && t[id] !== undefined) el.textContent = t[id];
+  });
+  document.getElementById('about-text-ar').style.display = lang === 'ar' ? '' : 'none';
+  document.getElementById('about-text-en').style.display = lang === 'en' ? '' : 'none';
+  updateMarkets();
+}
+
+// ===== WAR COUNTER =====
+function updateCounter() {
+  const start = new Date('2023-10-07T06:30:00Z');
+  const diff = Date.now() - start;
+  document.getElementById('counter-days').textContent = Math.floor(diff/86400000).toLocaleString();
+  document.getElementById('counter-hours').textContent = String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
+  document.getElementById('counter-mins').textContent = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+}
+updateCounter();
+setInterval(updateCounter, 60000);
+
+// ===== MARKETS =====
+function updateMarkets() {
+  const t = T[currentLang];
+  const sp = (5580 + (Math.random()-0.5)*300).toFixed(2);
+  const spChg = ((Math.random()-0.52)*2.5).toFixed(2);
+  const dow = (44200 + (Math.random()-0.5)*900).toFixed(0);
+  const dowChg = ((Math.random()-0.52)*2).toFixed(2);
+  const vix = (17 + Math.random()*22).toFixed(1);
+  const oil = (73 + Math.random()*28).toFixed(2);
+  const oilChg = ((Math.random()-0.4)*3.5).toFixed(2);
+
+  document.getElementById('sp500-val').textContent = Number(sp).toLocaleString();
+  const spEl = document.getElementById('sp500-chg');
+  spEl.textContent = (spChg>=0?'▲':'▼') + Math.abs(spChg) + '%';
+  spEl.className = 'market-change ' + (spChg>=0?'up':'down');
+
+  document.getElementById('dow-val').textContent = Number(dow).toLocaleString();
+  const dowEl = document.getElementById('dow-chg');
+  dowEl.textContent = (dowChg>=0?'▲':'▼') + Math.abs(dowChg) + '%';
+  dowEl.className = 'market-change ' + (dowChg>=0?'up':'down');
+
+  document.getElementById('vix-val').textContent = vix;
+  const vb = document.getElementById('vix-badge');
+  if (vix < 20) { vb.textContent = t.vix_low; vb.className = 'vix-badge vix-low'; }
+  else if (vix < 30) { vb.textContent = t.vix_mid; vb.className = 'vix-badge vix-mid'; }
+  else { vb.textContent = t.vix_high; vb.className = 'vix-badge vix-high'; }
+
+  document.getElementById('oil-val').textContent = oil + '$';
+  const oilEl = document.getElementById('oil-chg');
+  oilEl.textContent = (oilChg>=0?'▲':'▼') + Math.abs(oilChg) + '%';
+  oilEl.className = 'market-change ' + (oilChg>=0?'up':'down');
+
+  const impact = document.getElementById('market-impact');
+  if (spChg < -1.2 || vix > 28) { impact.textContent = t.m_iran; impact.style.color='#e74c3c'; }
+  else if (spChg > 1.2 && vix < 20) { impact.textContent = t.m_usa; impact.style.color='#2980b9'; }
+  else { impact.textContent = t.m_neutral; impact.style.color='var(--gold)'; }
+}
+updateMarkets();
+setInterval(updateMarkets, 30000);
+
+// ===== AI =====
+const GEMINI_API_KEY = 'AIzaSyAjdAYLpNnn6QdoSl-U3yqDQ13T-jml46U';
+const TYPE_MAP = {
+  'ضربة':'type-strike','strike':'type-strike','military':'type-strike','عسكري':'type-strike',
+  'طائرة':'type-drone','drone':'type-drone',
+  'دبلوماسي':'type-diplo','diplomatic':'type-diplo',
+  'بحري':'type-naval','naval':'type-naval',
+  'استخبارات':'type-intel','intel':'type-intel',
+  'نووي':'type-nuke','nuclear':'type-nuke'
+};
+
+function log(msg) {
+  const el = document.getElementById('ai-log');
+  el.style.display = 'block';
+  el.innerHTML += `<p>› ${msg}</p>`;
+  el.scrollTop = el.scrollHeight;
+}
+function setAIState(txt, busy) {
+  document.getElementById('ai-state').textContent = txt;
+  const btn = document.getElementById('ai-btn');
+  const icon = document.getElementById('ai-btn-icon');
+  btn.disabled = busy;
+  icon.textContent = busy ? '⟳' : '⚡';
+  icon.className = busy ? 'spin' : '';
+}
+
+async function runAIUpdate() {
+  const t = T[currentLang];
+  document.getElementById('ai-log').innerHTML = '';
+  setAIState(t.connecting, true);
+  log(t.connecting);
+
+  const PROMPT = `You are a geopolitical analyst. Analyze the current state of the conflict between:
+- IRAN AXIS: Iran, Hezbollah (Lebanon), Houthis (Yemen), Iraqi factions (Al-Nujaba, Hashd al-Shaabi, Kataib Hezbollah)
+- US-ISRAEL AXIS: USA, Israel, UK, Saudi Arabia, UAE, Bahrain, Kuwait, Qatar
+
+Use latest news from: Reuters, BBC, AP, Al Jazeera English, Tasnim News Agency (Iran), Fars News Agency (Iran).
+
+Consider these real-world factors:
+1. Active military operations in Gaza, Lebanon, Yemen, Iraq, and direct Iran strikes
+2. Status of Strait of Hormuz (Iran controls) and Bab el-Mandeb (Houthis control)
+3. US financial markets (S&P 500 drops = weakens USA position, high VIX = panic)
+4. Oil prices (high oil = benefits Iran economically)
+5. Diplomatic moves and international support
+
+Respond with PURE JSON ONLY — zero extra text, zero backticks:
+{"iran_pct":42,"usa_pct":58,"tension_pct":82,"tension_label":"مرتفع جداً","tension_status":"⚠ تصعيد نشط","iran_caps":{"air":52,"missiles":78,"drones":70,"naval":45,"nuclear":60,"economy":30},"usa_caps":{"air":94,"missiles":88,"drones":85,"naval":96,"nuclear":99,"economy":92},"iran_events":[{"time":"HH:MM","type":"ضربة","text":"وصف الحدث بالعربية"}],"usa_events":[{"time":"HH:MM","type":"بحري","text":"وصف الحدث بالعربية"}],"fronts":{"gaza":"حرب مستمرة","lebanon":"توتر متقطع","yemen":"هجمات بحرية","iran":"استنفار","iraq":"فصائل نشطة"},"hormuz":"مفتوح","mandab":"مهدد","ticker":["خبر عاجل 1","خبر عاجل 2","خبر عاجل 3","خبر عاجل 4","خبر عاجل 5"],"summary":"ملخص تحليلي مفصل"}
+RULES: iran_pct+usa_pct=100 | all percentages 0-100 | 3-4 events each side | JSON ONLY.`;
+
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+      { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ contents:[{parts:[{text:PROMPT}]}], generationConfig:{maxOutputTokens:1500,temperature:0.7} }) }
+    );
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error?.message || `HTTP ${res.status}`); }
+    const data = await res.json();
+    log(t.receiving);
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    if (!raw) throw new Error('Empty response');
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const s = clean.indexOf('{'), e2 = clean.lastIndexOf('}');
+    if (s===-1) throw new Error('No JSON found');
+    const json = JSON.parse(clean.slice(s, e2+1));
+    log(`إيران ${json.iran_pct}% | التحالف ${json.usa_pct}% | توتر ${json.tension_pct}%`);
+    if (json.summary) log(`📌 ${json.summary}`);
+    applyUpdate(json);
+    setAIState(t.done, false);
+  } catch(err) {
+    log(`⚠ ${t.error}: ${err.message}`);
+    setAIState(t.failed, false);
+  }
+}
+
+function applyUpdate(d) {
+  document.getElementById('iran-pct').textContent = d.iran_pct + '%';
+  document.getElementById('usa-pct').textContent = d.usa_pct + '%';
+  document.getElementById('balance-marker').style.left = d.iran_pct + '%';
+  document.getElementById('tension-bar').style.width = d.tension_pct + '%';
+  document.getElementById('tension-label').textContent = d.tension_label || 'مرتفع';
+  document.getElementById('tension-status').textContent = d.tension_status || '⚠ نشط';
+
+  if (d.iran_caps) {
+    setBar('iran-air',d.iran_caps.air); setBar('iran-mis',d.iran_caps.missiles);
+    setBar('iran-drone',d.iran_caps.drones); setBar('iran-nav',d.iran_caps.naval);
+    setBar('iran-nuke',d.iran_caps.nuclear); setBar('iran-econ',d.iran_caps.economy);
+  }
+  if (d.usa_caps) {
+    setBar('usa-air',d.usa_caps.air); setBar('usa-mis',d.usa_caps.missiles);
+    setBar('usa-drone',d.usa_caps.drones); setBar('usa-nav',d.usa_caps.naval);
+    setBar('usa-nuke',d.usa_caps.nuclear); setBar('usa-econ',d.usa_caps.economy);
+  }
+  if (d.iran_events) renderFeed('iran-feed', d.iran_events);
+  if (d.usa_events) renderFeed('usa-feed', d.usa_events);
+
+  if (d.fronts) {
+    if (d.fronts.gaza) document.getElementById('gaza-status').textContent = d.fronts.gaza;
+    if (d.fronts.lebanon) document.getElementById('lebanon-status').textContent = d.fronts.lebanon;
+    if (d.fronts.yemen) document.getElementById('yemen-status').textContent = d.fronts.yemen;
+    if (d.fronts.iran) document.getElementById('iran-front-status').textContent = d.fronts.iran;
+    if (d.fronts.iraq) document.getElementById('iraq-status').textContent = d.fronts.iraq;
+  }
+
+  const setStraits = (id, val) => {
+    if (!val) return;
+    const el = document.getElementById(id);
+    el.textContent = val;
+    el.className = 'strait-status ' +
+      (val.includes('مغلق')||val.toLowerCase().includes('closed') ? 'status-closed' :
+       val.includes('مهدد')||val.toLowerCase().includes('threat') ? 'status-threat' : 'status-open');
+  };
+  setStraits('hormuz-status', d.hormuz);
+  setStraits('mandab-status', d.mandab);
+
+  if (d.ticker && d.ticker.length) {
+    const items = [...d.ticker, ...d.ticker].map(n =>
+      `<span class="ticker-item">${n} <span class="ticker-dot">🔴</span></span>`).join('');
+    document.getElementById('ticker-track').innerHTML = items;
+  }
+
+  const now = new Date();
+  const t = T[currentLang];
+  document.getElementById('last-updated').textContent =
+    t.updated + ' ' + now.toLocaleDateString(currentLang==='ar'?'ar-SA':'en-US') +
+    ' — ' + now.toLocaleTimeString(currentLang==='ar'?'ar-SA':'en-US',{hour:'2-digit',minute:'2-digit'});
+}
+
+function setBar(id, val) {
+  const b = document.getElementById(id), v = document.getElementById(id+'-v');
+  if (b && val!==undefined) b.style.width = val+'%';
+  if (v && val!==undefined) v.textContent = val+'%';
+}
+function renderFeed(cid, events) {
+  document.getElementById(cid).innerHTML = events.map(ev => {
+    const cls = TYPE_MAP[ev.type] || 'type-intel';
+    return `<div class="feed-item"><span class="feed-time">${ev.time||'--:--'}</span><span class="feed-type ${cls}">${ev.type}</span><span>${ev.text}</span></div>`;
+  }).join('');
+}
+function shareSite() {
+  if (navigator.share) { navigator.share({title:'BRIXONI | مؤشر الحرب',url:'https://brixoni.com'}); }
+  else { navigator.clipboard.writeText('https://brixoni.com'); alert(currentLang==='ar'?'تم نسخ رابط الموقع!':'Site link copied!'); }
+}
+
+// Auto-update every 30 minutes
+setInterval(runAIUpdate, 30*60*1000);
+</script>
+</body>
+</html>
